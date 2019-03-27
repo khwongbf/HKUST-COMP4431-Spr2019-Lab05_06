@@ -89,6 +89,20 @@
             // then, increase the saturation by the saturation factor
             // ***** beware of the final range of the saturation *****
             // after that, convert it back to RGB
+			
+			var h = imageproc.fromRGBToHSL(r,g,b)["h"];
+			var s = imageproc.fromRGBToHSL(r,g,b)["s"];
+			var v = imageproc.fromRGBToHSL(r,g,b)["v"];
+			
+			s *= saturation;
+			
+			if (s >= 1.0){
+				s = 1.0;
+			}
+			
+			r = imageproc.fromHSLToRGB(h,s,v)["r"];
+			g = imageproc.fromHSLToRGB(h,s,v)["g"];
+			b = imageproc.fromHSLToRGB(h,s,v)["b"];
 
             // Second, based on the saturated colour, find the matching colour
             // from the comic colour palette
