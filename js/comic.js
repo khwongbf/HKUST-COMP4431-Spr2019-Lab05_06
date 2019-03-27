@@ -96,8 +96,10 @@
 			
 			s *= saturation;
 			
-			if (s >= 1.0){
+			if (s > 1.0){
 				s = 1.0;
+			} else if (s < 0.0){
+				s = 0.0;
 			}
 			
 			r = imageproc.fromHSLToRGB(h,s,v)["r"];
@@ -107,10 +109,20 @@
             // Second, based on the saturated colour, find the matching colour
             // from the comic colour palette
             // This is done by finding the minimum distance between the colours
+			
+			var closestIndex = -1;
+			var closestDistance = Number.MAX_VALUE;
+			for (var j = 0; j < palette.length; j++){
+				var currentDistance = Math.hypot((r - palette[j][0]), (g - palette[j][1]), (b - palette[j][2]));
+				if (currentDistance < closestDistance){
+					closestDistance = currentDistance;
+					closestIndex = j;
+				}
+			}
 
-            outputData.data[i]     = r;
-            outputData.data[i + 1] = g;
-            outputData.data[i + 2] = b;
+            outputData.data[i]     = palette[closestIndex][0];
+            outputData.data[i + 1] = palette[closestIndex][1];
+            outputData.data[i + 2] = palette[closestIndex][2];
         }
     }
  
