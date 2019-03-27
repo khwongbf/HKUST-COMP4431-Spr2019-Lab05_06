@@ -76,14 +76,14 @@
            
             // Change the colour to black or white based on the given threshold
 			
-			if (grayscale > thresholdValue){
-				outputData.data[i]     = 255;
-				outputData.data[i + 1] = 255;
-				outputData.data[i + 2] = 255;
-			}else{
+			if (grayscale < thresholdValue){
 				outputData.data[i]     = 0;
 				outputData.data[i + 1] = 0;
 				outputData.data[i + 2] = 0;
+			}else{
+				outputData.data[i]     = 255;
+				outputData.data[i + 1] = 255;
+				outputData.data[i + 2] = 255;
 			}
 
             
