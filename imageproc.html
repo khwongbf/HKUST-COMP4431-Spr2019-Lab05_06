@@ -493,11 +493,19 @@
                  */
 
                 /* 1. The Sobel edge will be applied to the grayscale image */
+                var grayscale = imageproc.createBuffer(outputImage);
+                imageproc.grayscale(baseLayer2, grayscale);
 
                 /* 2. The image can be blurred before applying the Sobel edge
                    detection (read the value of the sobel-blur checkbox) */
+                var blurredGrayscale = imageproc.createBuffer(outputImage);
+                if ($("#sobel-blur").prop("checked")){
+                    imageproc.blur(grayscale, blurredGrayscale, $("#sobel-blur-kernel-size").val());
+                } else{
+                    imageproc.copyImageData(grayscale, blurredGrayscale);
+                }
 
-                imageproc.sobelEdge(shadeLayer, outlineLayer,
+                imageproc.sobelEdge(blurredGrayscale, outlineLayer,
                                     $("#sobel-threshold").val());
 
                 /**
@@ -506,6 +514,16 @@
                  */
 
                 /* Flip the edge values */
+                /* Use transparency for non-edge pixels */
+                if ($("#sobel-flip").prop("checked")) {
+                    /* Show base layer */
+                    for (var i = 0; i < outlineLayer.data.length; i+=4) {
+                        outlineLayer.data[i]     = 255 - outlineLayer.data[i];
+                        outlineLayer.data[i + 1] = 255 - outlineLayer.data[i + 1];
+                        outlineLayer.data[i + 2] = 255 - outlineLayer.data[i + 2];
+                        
+                    }
+                }
 
                 /**
                  * In the following code, the non-edge pixels become
@@ -517,10 +535,18 @@
                 if ($("#sobel-transparent").prop("checked")) {
                     /* Show base layer */
                     for (var i = 0; i < outlineLayer.data.length; i+=4) {
-                        if (outlineLayer.data[i] == 0) {
-                            outlineLayer.data[i]     = shadeLayer.data[i];
-                            outlineLayer.data[i + 1] = shadeLayer.data[i + 1];
-                            outlineLayer.data[i + 2] = shadeLayer.data[i + 2];
+                        if ($("#sobel-flip").prop("checked")){
+                            if (outlineLayer.data[i] == 255) {
+                                outlineLayer.data[i]     = shadeLayer.data[i];
+                                outlineLayer.data[i + 1] = shadeLayer.data[i + 1];
+                                outlineLayer.data[i + 2] = shadeLayer.data[i + 2];
+                            }
+                        }else{
+                            if (outlineLayer.data[i] == 0) {
+                                outlineLayer.data[i]     = shadeLayer.data[i];
+                                outlineLayer.data[i + 1] = shadeLayer.data[i + 1];
+                                outlineLayer.data[i + 2] = shadeLayer.data[i + 2];
+                            }
                         }
                     }
                 }
