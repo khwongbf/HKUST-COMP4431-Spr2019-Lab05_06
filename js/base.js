@@ -101,22 +101,35 @@
 
         // You are given a 3x3 kernel but you need to create a proper kernel
         // using the given kernel size
-        var kernel = [ [1, 1, 1], [1, 1, 1], [1, 1, 1] ];
+        
+        var kernel = new Array(kernelSize);
+        
+        for (var i = 0; i < kernelSize; i++){
+            kernel[i] = new Array(kernelSize);
+            for (var j = 0; j < kernelSize; j++){
+                kernel[i][j] = 1;
+            }
+        }
+
 
         // The following code applies the 3x3 kernel to the image but the code
         // has hardcoded the size so you need to make changes to allow for
         // different kernel sizes
+        
+        var halfSize = parseInt(kernelSize / 2);
 
         for (var y = 0; y < inputData.height; y++) {
             for (var x = 0; x < inputData.width; x++) {
                 var sumR = 0, sumG = 0, sumB = 0;
 
                 /* Sum the product of the kernel on the pixels */
-                for (var j = -1; j <= 1; j++) {
-                    for (var i = -1; i <= 1; i++) {
+                for (var j = -1 * halfSize; j <= halfSize ; j++) {
+                    for (var i = -1 * halfSize ; i <= halfSize; i++) {
                         var pixel =
                             imageproc.getPixel(inputData, x + i, y + j);
-                        var coeff = kernel[j + 1][i + 1];
+                        
+                        var coeff = kernel[j + halfSize][i + halfSize];
+                        
 
                         sumR += pixel.r * coeff;
                         sumG += pixel.g * coeff;
@@ -126,9 +139,9 @@
 
                 /* Set the averaged pixel to the output data */
                 var i = (x + y * outputData.width) * 4;
-                outputData.data[i]     = sumR / 9;
-                outputData.data[i + 1] = sumG / 9;
-                outputData.data[i + 2] = sumB / 9;
+                outputData.data[i]     = sumR / (kernelSize * kernelSize);
+                outputData.data[i + 1] = sumG / (kernelSize * kernelSize);
+                outputData.data[i + 2] = sumB / (kernelSize * kernelSize);
             }
         }
     } 

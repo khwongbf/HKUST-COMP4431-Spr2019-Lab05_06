@@ -12,14 +12,16 @@
          * You need to clearly understand the following code to make
          * appropriate changes
          */
+        var subRegionSize = parseInt(size / 2) + 1;
+        var halfSubRegionSize = parseInt(subRegionSize / 2);
 
         /* An internal function to find the regional stat centred at (x, y) */
         function regionStat(x, y) {
             /* Find the mean colour and brightness */
             var meanR = 0, meanG = 0, meanB = 0;
             var meanValue = 0;
-            for (var j = -1; j <= 1; j++) {
-                for (var i = -1; i <= 1; i++) {
+            for (var j = -1 * halfSubRegionSize; j <= halfSubRegionSize; j++) {
+                for (var i = -1 * halfSubRegionSize; i <= halfSubRegionSize; i++) {
                     var pixel = imageproc.getPixel(inputData, x + i, y + j);
 
                     /* For the mean colour */
@@ -31,22 +33,22 @@
                     meanValue += (pixel.r + pixel.g + pixel.b) / 3;
                 }
             }
-            meanR /= 9;
-            meanG /= 9;
-            meanB /= 9;
-            meanValue /= 9;
+            meanR /= (subRegionSize * subRegionSize);
+            meanG /= (subRegionSize * subRegionSize);
+            meanB /= (subRegionSize * subRegionSize);
+            meanValue /= (subRegionSize * subRegionSize);
 
             /* Find the variance */
             var variance = 0;
-            for (var j = -1; j <= 1; j++) {
-                for (var i = -1; i <= 1; i++) {
+            for (var j = -1 * halfSubRegionSize; j <= halfSubRegionSize; j++) {
+                for (var i = -1 * halfSubRegionSize; i <= halfSubRegionSize; i++) {
                     var pixel = imageproc.getPixel(inputData, x + i, y + j);
                     var value = (pixel.r + pixel.g + pixel.b) / 3;
 
                     variance += Math.pow(value - meanValue, 2);
                 }
             }
-            variance /= 9;
+            variance /= (subRegionSize * subRegionSize);
 
             /* Return the mean and variance as an object */
             return {
@@ -58,10 +60,10 @@
         for (var y = 0; y < inputData.height; y++) {
             for (var x = 0; x < inputData.width; x++) {
                 /* Find the statistics of the four sub-regions */
-                var regionA = regionStat(x - 1, y - 1, inputData);
-                var regionB = regionStat(x + 1, y - 1, inputData);
-                var regionC = regionStat(x - 1, y + 1, inputData);
-                var regionD = regionStat(x + 1, y + 1, inputData);
+                var regionA = regionStat(x - halfSubRegionSize, y - halfSubRegionSize, inputData);
+                var regionB = regionStat(x + halfSubRegionSize, y - halfSubRegionSize, inputData);
+                var regionC = regionStat(x - halfSubRegionSize, y + halfSubRegionSize, inputData);
+                var regionD = regionStat(x + halfSubRegionSize, y + halfSubRegionSize, inputData);
 
                 /* Get the minimum variance value */
                 var minV = Math.min(regionA.variance, regionB.variance,
